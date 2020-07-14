@@ -4,9 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
@@ -27,14 +34,20 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,11 +70,30 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+import com.example.invoiceprinting.MyService;
+import com.example.invoiceprinting.MyService.MyLocalBinder;
 
-    private Button btnCapture;
+import static com.example.invoiceprinting.R.layout.dialog_select_item;
+
+public class MainActivity extends AppCompatActivity {
+    final private static String BASEURL = "http://192.168.1.10:2424/";
+
+    private RecyclerView rViewListPredicteItems;
+    private RecyclerView recyclerListCart;
+
+    private CartedItemAdapter cartAdapter;
+    private Button btnCapture, btnPrint;
     private TextureView textureView;
-    private TextView tv_res;
+    private List<M_detected_class> detected_objs;
+
+    EditText editTextQuantity;
+    // search bar
+    SearchView searchView;
+    ListView myList;
+
+    ArrayList<String> list;
+    ArrayAdapter<String> adapter;
+
 
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -86,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
 
-    HashMap<String, List<HashMap<String, String>>> resResult;
+    HashMap<String, List<M_detected_class>> resResult;
     private List<String> resError;
     CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -108,6 +140,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    MyService myService;
+    boolean isbound = false;
+
+    public void showTime(View view){
+        String currenttime = myService.getCurrentTime();
+        Toast.makeText(MainActivity.this, currenttime, Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +158,13 @@ public class MainActivity extends AppCompatActivity {
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
         btnCapture = (Button)findViewById(R.id.btnCapture);
-        tv_res = (TextView) findViewById(R.id.tv_res);
+        btnPrint = (Button)findViewById(R.id.btn_print_carted);
+
+        // search bar
+        searchView = (SearchView) findViewById(R.id.searchView);
+        searchView = (SearchView) findViewById(R.id.searchView);
+        myList = (ListView) findViewById(R.id.serachList);
+
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
@@ -128,12 +173,87 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // recycler view
+        rViewListPredicteItems = (RecyclerView) findViewById(R.id.recyclerListItem);
+        rViewListPredicteItems.setLayoutManager(new LinearLayoutManager(MainActivity.this));
 
+        setUpCartRecyclerView();
+
+        Intent intent = new Intent(this, MyService.class);
+        bindService(intent, myConnection, Context.BIND_AUTO_CREATE);
+
+        searchBarListner();
+    }
+
+    private void searchBarListner() {
+        list = new ArrayList<String>();
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
+        myList.setAdapter(adapter);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+//                Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+                if(list.contains("Monday")) {
+                    list.remove("Monday");
+                    adapter.notifyDataSetChanged();
+                }else {
+                    list.add("Monday");
+                    adapter.notifyDataSetChanged();
+                }
+//                adapter.getFilter().filter(s);
+                return false;
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        showTime();
+    }
+
+    private ServiceConnection myConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MyLocalBinder myLocalBinder = (MyLocalBinder) service;
+            myService = myLocalBinder.getService();
+            isbound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isbound = false;
+        }
+    };
+
+
+
+    private void setUpCartRecyclerView()
+    {
+        // recycler view
+        recyclerListCart = (RecyclerView) findViewById(R.id.recyclerListCart);
+        recyclerListCart.setLayoutManager(new LinearLayoutManager(MainActivity.this,RecyclerView.HORIZONTAL,false));
+
+        CartedItemAdapter.OnListClickListener listener=new CartedItemAdapter.OnListClickListener() {
+            @Override
+            public void onListClick(M_detected_class value) {
+
+            }
+        };
+        cartAdapter=new CartedItemAdapter(this,listener);
+        recyclerListCart.setAdapter(cartAdapter);
     }
 
     private void SentImageToServer(String image) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.1.10:2424/")
+                .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -155,24 +275,70 @@ public class MainActivity extends AppCompatActivity {
                 resResult =  postResponse.getResult() ;
                 resError = postResponse.getError();
                 Log.i("my_res", String.valueOf(resResult));
-                List<HashMap<String, String>> detected_objs = resResult.get("detected_classes");
-                for(HashMap<String, String> post: detected_objs){
-                    String class_name = post.get("class_name");
-                    String score = post.get("score");
-                    Log.i("my_res", class_name);
-                    Toast.makeText(MainActivity.this, String.valueOf(class_name), Toast.LENGTH_SHORT).show();
-                }
+                detected_objs = resResult.get("detected_classes");
+
+                PredictedItemAdapter.OnListClickListener listener=new PredictedItemAdapter.OnListClickListener() {
+                    @Override
+                    public void onListClick(M_detected_class item) {
+                        //onlick listner
+                        CreateAlertBox(item);
+                    }
+                };
+
+                PredictedItemAdapter predictedItemAdapter = new PredictedItemAdapter(MainActivity.this,detected_objs,listener);
+                rViewListPredicteItems.setAdapter(predictedItemAdapter);
             }
 
             @Override
             public void onFailure(Call<M_receive_image> call, Throwable t) {
                 Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                tv_res.setText(t.getMessage());
+
             }
         });
 
 
-}
+    }
+
+    private void CreateAlertBox(final M_detected_class item) {
+//        ItemSelectDialog itemSelectDialog = new ItemSelectDialog();
+//        itemSelectDialog.show();
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+        builder1.setMessage("Please add quantity");
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+
+        View view = layoutInflater.inflate(dialog_select_item, null);
+        builder1.setView(view);
+        builder1.setCancelable(true);
+
+
+
+        builder1.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        String quantity = editTextQuantity.getText().toString();
+                        item.quantity = quantity;
+                        cartAdapter.addItem(item);
+                        //getall carted items
+                        //List<M_detected_class>=cartAdapter.getCartedItems();
+                        // sat visibility of print button
+                        btnPrint.setVisibility(View.VISIBLE);
+                    }
+                });
+
+        builder1.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        editTextQuantity = view.findViewById(R.id.quantity);
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void takePicture() {
@@ -371,6 +537,49 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    public void setBtnPrintCarted(View view){
+        List<M_detected_class> m_detected_classes = cartAdapter.getCartedItems();
+//        Toast.makeText(this, "len " + String.valueOf(m_detected_classes.size()), Toast.LENGTH_SHORT).show();
+        // Add carted items to DB
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        JsonPlaceholderAPI jsonPlaceHolderApi = retrofit.create(JsonPlaceholderAPI.class);
+        Map<String,List<M_detected_class>> parameters = new HashMap<>();
+        parameters.put("carted_items", m_detected_classes);
+
+        Call<M_add_carted_items> call = jsonPlaceHolderApi.addCartedItem(parameters);
+        call.enqueue(new Callback<M_add_carted_items>() {
+            @Override
+            public void onResponse(Call<M_add_carted_items> call, Response<M_add_carted_items> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(MainActivity.this, "Code: "+ response.code(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                M_add_carted_items postResponse = response.body();
+
+                HashMap<String, String> result =  postResponse.getResult() ;
+                resError = postResponse.getError();
+
+                String invoice_num = result.get("invoice_num");
+
+                Toast.makeText(MainActivity.this, "Invoice num: " + invoice_num, Toast.LENGTH_SHORT).show();
+                cartAdapter.removeAll();
+                // set visibility of print button
+                btnPrint.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onFailure(Call<M_add_carted_items> call, Throwable t) {
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

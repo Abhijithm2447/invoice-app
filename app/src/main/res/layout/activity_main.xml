@@ -1,27 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
+
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search here"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextureView
         android:id="@+id/textureView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/btnCapture"
-        />
+        android:layout_height="300dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchView" />
+
+
+
     <Button
         android:id="@+id/btnCapture"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Capture"
-        />
-<TextView
-    android:id="@+id/tv_res"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    />
-</RelativeLayout>
+        app:layout_constraintBottom_toBottomOf="@+id/textureView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.966" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerListCart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnCapture"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textureView"
+        tools:itemCount="4"
+        tools:listitem="@layout/list_item_carted_sell" />
+
+    <Button
+        android:id="@+id/btn_print_carted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnCapture"
+        android:layout_alignParentEnd="true"
+        android:onClick="setBtnPrintCarted"
+        android:text="Print"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/recyclerListCart"
+        app:layout_constraintEnd_toEndOf="@+id/recyclerListCart"
+        app:layout_constraintTop_toBottomOf="@+id/textureView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerListItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/recyclerListCart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerListCart"
+        tools:listitem="@layout/predicted_item_row" />
+    <ListView
+        android:id="@+id/serachList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="4dp"
+        android:background="@android:color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchView"
+        ></ListView>
+</androidx.constraintlayout.widget.ConstraintLayout>
