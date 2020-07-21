@@ -76,7 +76,7 @@ import com.example.invoiceprinting.MyService.MyLocalBinder;
 import static com.example.invoiceprinting.R.layout.dialog_select_item;
 
 public class MainActivity extends AppCompatActivity {
-    final private static String BASEURL = "http://192.168.1.10:2424/";
+    final private static String BASEURL = "http://192.168.137.1:2424/";
 
     private RecyclerView rViewListPredicteItems;
     private RecyclerView recyclerListCart;

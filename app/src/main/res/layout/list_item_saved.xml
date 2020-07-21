@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+        <ImageView
+            android:id="@+id/object_image"
+            android:layout_width="120dp"
+            android:layout_height="100dp"
+            android:src="@color/black"
+            android:layout_marginBottom="6dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/object_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:ellipsize="marquee"
+        android:maxLines="2"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:text="Name"
+        android:textColor="@color/colorPrimary"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/object_image"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/object_price"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:layout_marginTop="2dp"
+        android:text="Rs 500"
+        android:textColor="@color/black"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/object_name"
+        app:layout_constraintTop_toBottomOf="@+id/object_brand" />
+
+    <TextView
+        android:id="@+id/object_brand"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:text="Brand"
+        android:textColor="@android:color/black"
+        android:textSize="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/object_name"
+        app:layout_constraintTop_toBottomOf="@+id/object_name" />
+
+
+    <TextView
+        android:id="@+id/object_quantity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:text="Qty 1"
+        android:textColor="@android:color/black"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/textViewRemove"
+        app:layout_constraintStart_toStartOf="@+id/object_name"
+        app:layout_constraintTop_toBottomOf="@+id/object_price" />
+
+
+    <TextView
+        android:id="@+id/textViewRemove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:text="Remove"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="12dp"
+        android:padding="12dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
