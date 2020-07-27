@@ -23,7 +23,7 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".CameraActivity"
+        <activity android:name=".BarCodeActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing">
@@ -38,6 +38,18 @@
         </activity>
 
         <activity android:name=".MainActivity">
+
+        </activity>
+
+        <activity android:name=".LoginActivity">
+
+        </activity>
+
+        <activity android:name=".PhoneLoginActivity">
+
+        </activity>
+
+        <activity android:name=".RegisterActivity">
 
         </activity>
 

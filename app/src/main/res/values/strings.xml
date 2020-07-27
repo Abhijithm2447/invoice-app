@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">Invoice Printing</string>
+
+
+
+    <string name="login">Login</string>
+    <string name="forget_password">Forget Password?</string>
+    <string name="phone">Phone</string>
+    <string name="create_account">Create Account</string>
+    <string name="find_friends">Find Friends</string>
+    <string name="settings">Settings</string>
+    <string name="logout">Logout</string>
+    <string name="hey_i_am_available_now">Hey, I am available now</string>
+    <string name="username">Username</string>
+    <string name="send_verification_code">Send Verification Code</string>
+    <string name="write_verification_code">Write verification code</string>
+    <string name="write_phone_number">Write phone number</string>
+    <string name="status">Status</string>
+    <string name="send_message">Send Message</string>
+    <string name="cancel_chat_request">Cancel Chat Request</string>
+    <string name="accept">Accept</string>
+    <string name="cancel">Cancel</string>
+    <string name="type_message_here">Type message here</string>
+    <string name="receiver_messages_here">Receiver Messages Here</string>
+    <string name="sender_messages">Sender Messages</string>
+    <string name="name">Name</string>
+    <string name="group_name">Group Name</string>
+    <string name="group_description">Group Description</string>
+
+
 </resources>

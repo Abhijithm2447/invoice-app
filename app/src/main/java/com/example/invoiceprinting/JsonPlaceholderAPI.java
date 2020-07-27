@@ -18,9 +18,17 @@ public interface JsonPlaceholderAPI {
 
     @FormUrlEncoded
     @POST("searchbar_suggestions/")
-    Call<SearchSuggestionModel> getSearchSuggestions(@Field("query") String query);
+    Call<SearchSuggestionModel> getSearchSuggestions(@Field("query") String query,@Field("shop_id") String shop_id);
 
     @FormUrlEncoded
     @POST("search/")
-    Call<M_receive_image> searchQuery(@Field("query") String query);
+    Call<M_receive_image> searchQuery(@Field("query") String query,@Field("shop_id") String shop_id);
+
+    @FormUrlEncoded
+    @POST("item_details/")
+    Call<M_receive_image> getItemDetails(@Field("id") String id,@Field("shop_id") String shop_id);
+
+    @FormUrlEncoded
+    @POST("get_shop/")
+    Call<ShopResultModel> getShopDetails(@Field("shop_id") String id);
 }
